@@ -1,6 +1,5 @@
 -- Emperean Reanimate RELEASE_1
 
-sethiddenproperty(LocalPlayer,"SimulationRadius",1000)
 
 local CFrame = CFrame
 local CFramenew = CFrame.new
