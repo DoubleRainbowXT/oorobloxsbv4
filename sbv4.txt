@@ -1,467 +1,398 @@
--- Emperean Reanimate RELEASE_1
-
-
-local CFrame = CFrame
-local CFramenew = CFrame.new
-local CFrameAngles = CFrame.Angles
-local CFrameidentity = CFrame.identity
-
-local Accessories = {
-	{ Mesh = "14768666349", Texture = "14768664565", Name = "Torso" },
-	{ Mesh = "14768684979", Texture = "14768683674", CFrame = CFrameAngles(0, 0, 1.57), Name = "Right Arm" },
-	{ Mesh = "14768684979", Texture = "14768683674", CFrame = CFrameAngles(0, 0, 1.57), Name = "Left Arm" }
+local a={}
+local l={}
+local acs={}
+local fl={}
+local chc=nil
+local chch=nil
+local chr=nil
+local con=nil
+local ad=nil
+local chp=nil
+local ip=nil
+local g=game
+local oc=os.clock
+local sim=oc()
+local tim=0
+local ltim=0
+local dt=0
+local inn=Instance.new
+local t=task
+local tw=t.wait
+local ts=t.spawn
+local cf=CFrame
+local cfn=CFrame.new
+local cfa=CFrame.Angles
+local cfi=CFrame.identity
+local acst={
+	{m="14768666349",t="14768664565",n="Torso"},
+	{m="11159370334",t="11159284657",n="Right Arm",c=cfa(0,-1.57,1.57)},
+	{m="11263221350",t="11263219250",n="Left Arm",c=cfa(0,1.57,1.57)},
+	{m="14768684979",t="14768683674",n="Right Leg",c=cfa(0,0,1.57)},
+	{m="14768684979",t="14768683674",n="Left Leg",c=cfa(0,0,1.57)}
 }
-
-local Success = false
-local Changed = nil
-local CharacterAdded = nil
-local Connection = nil
-
-local Linear = 26
-local Angular = 0
-local Sleep = 0
-
-local RaycastParameters = RaycastParams.new()
-RaycastParameters.FilterType = Enum.RaycastFilterType.Exclude
-
-local Aligns = { }
-local Attachments = { }
-local Blacklist = { }
-
-local Instancenew = Instance.new
-
-local osclock = os.clock
-
-local stringmatch = string.match
-
-local math = math
-local mathabs = math.abs
-local mathcos = math.cos
-local mathclamp = math.clamp
-local mathrandom = math.random
-
-local table = table
-local tableinsert = table.insert
-local tableremove = table.remove
-local tableclear = table.clear
-local tablefind = table.find
-
-local Vector3 = Vector3
-local Vector3new = Vector3.new
-local Vector3zero = Vector3.zero
-
-local HeadSize = Vector3new(2, 1, 1)
-local TorsoSize = Vector3new(2, 2, 1)
-local LimbSize = Vector3new(1, 2, 1)
-local Scale = Vector3new(1.25, 1.25, 1.25)
-local RaycastDirection = Vector3new(0, - 1000, 0)
-
-local MeshTypeHead = Enum.MeshType.Head
-
-local task = task
-local taskwait = task.wait
-local taskspawn = task.spawn
-local taskdefer = task.defer
-
-local Workspace = game:FindFirstChildOfClass("Workspace")
-local CurrentCamera = nil
-
-local LocalPlayer = game:FindFirstChildOfClass("Players").LocalPlayer
-local Name = LocalPlayer.Name
-local Character = LocalPlayer.Character
-
-local RunService = game:FindFirstChildOfClass("RunService")
-local PreSimulation = RunService.PreSimulation
-local PreRender = RunService.PreRender
-local PostSimulation = RunService.PostSimulation
-
-local StarterGui = game:FindFirstChildOfClass("StarterGui")
-
-local function RefitCamera()
-	CurrentCamera = Workspace.CurrentCamera
-
-	if not CurrentCamera then
-		Workspace:GetPropertyChangedSignal("CurrentCamera"):Wait()
-		CurrentCamera = Workspace.CurrentCamera
+local ans=cfi
+local ma=math
+local mi=ma.min
+local si=ma.sin
+local mr=ma.random
+local sm=string.match
+local v=Vector3
+local vz=v.zero
+local vn=v.new
+local ls=vn(1,2,1)
+local trs=vn(2,2,1)
+local rad=vn(0,-1000,0)
+local vf=vn(8192,8192,8192)
+local t=table
+local ti=t.insert
+local tc=t.clear
+local w=g:FindFirstChildOfClass('Workspace')
+local rs=g:FindFirstChildOfClass('RunService')
+local ui=g:FindFirstChildOfClass("UserInputService")
+local sg=g:FindFirstChildOfClass('StarterGui')
+local cc=w.CurrentCamera
+local prs=rs.PreSimulation
+local ps=rs.PostSimulation
+local lp=g:FindFirstChildOfClass('Players').LocalPlayer
+local mo=lp:GetMouse()
+local u=Enum.UserInputType
+local ut=u.Touch
+local um=u.MouseButton1
+local rp=RaycastParams.new()
+rp.FilterType=Enum.RaycastFilterType.Exclude
+local shp=sethiddenproperty
+local function fc()
+	cc=w.CurrentCamera
+	if not cc then
+		w:GetPropertyChangedSignal('CurrentCamera'):Wait()
+		cc=w.CurrentCamera
 	end
-
-	Changed = Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
-		CurrentCamera = Workspace.CurrentCamera
+	w:GetPropertyChangedSignal('CurrentCamera'):Connect(function()
+		cc=w.CurrentCamera
 	end)
 end
-
-local function Parented(Instance)
-	return typeof(Instance) == "Instance" and Instance:IsDescendantOf(game)
+local function e(i)
+	return typeof(i)=='Instance'and i:IsDescendantOf(g)
 end
-
-local function FindInstance(Parent, ClassName, Name)
-	if Parented(Parent) then
-		for _, Instance in pairs(Parent:GetChildren()) do
-			if Instance:IsA(ClassName) and Instance.Name == Name then
-				return Instance
+local function fi(p,cn,n)
+	if typeof(p)=='Instance'then
+		for _,i in pairs(p:GetChildren())do
+			if i:IsA(cn) and i.Name==n then
+				return i
 			end
 		end
 	end
 end
-
-local function WaitForChildOfClass(Parent, ClassName)
-	if Parented(Parent) then
-		local Instance = Parent:FindFirstChildOfClass(ClassName)
-
-		while Parented(Parent) and not Instance do
-			Parent.ChildAdded:Wait()
-			Instance = Parent:FindFirstChildOfClass(ClassName)
+local function wfcoc(p,cn)
+	if typeof(p)=='Instance'then
+		local i=p:FindFirstChildOfClass(cn)
+		while e(p)and not i do
+			p.ChildAdded:Wait()
+			i=p:FindFirstChildOfClass(cn)
 		end
-
-		return Instance
+		return i
 	end
 end
-
-local function WaitForChildOfClassAndName(Parent, ...)
-	if Parented(Parent) then
-		local Instance = FindInstance(Parent, ...)
-
-		while Parented(Parent) and not Instance do
-			Parent.ChildAdded:Wait()
-			Instance = FindInstance(Parent, ...)
+local function wfcocan(p,...)
+	if typeof(p)=='Instance'then
+		local i=fi(p,...)
+		while e(p)and not i do
+			p.ChildAdded:Wait()
+			i=fi(p,...)
 		end
-
-		return Instance
+		return i
 	end
 end
-
-local function Part(Name, Size, Parent)
-	local Part = Instancenew("Part")
-	Part.Name = Name
-	Part.Size = Size
-	Part.Transparency = 1
-	Part.Parent = Parent
-
-	return Part
+local r=inn('Model')
+local function pt(n,s)
+	local pa=inn('Part')
+	pa.Name=n
+	pa.Size=s
+	pa.Transparency=1
+	pa.Parent=r
+	return pa
 end
-
-local function Motor6D(Name, Part0, Part1, C0, C1)
-	local Motor6D = Instancenew("Motor6D")
-	Motor6D.Name = Name
-	Motor6D.Part0 = Part0
-	Motor6D.Part1 = Part1
-	Motor6D.C0 = C0
-	Motor6D.C1 = C1
-	Motor6D.Parent = Part0
-
-	return Motor6D
+local function m(n,p0,p1,c0,c1)
+	local m=inn('Motor6D')
+	m.Name=n
+	m.Part0=p0
+	m.Part1=p1
+	m.C0=c0
+	m.C1=c1
+	m.Parent=p0
+	return m
 end
-
-local function Attachment(Name, CFrame, Parent)
-	local Attachment = Instancenew("Attachment")
-	Attachment.Name = Name
-	Attachment.CFrame = CFrame
-	Attachment.Parent = Parent
-
-	tableinsert(Attachments, Attachment)
-	return Attachment
+local function at(n,cf,p)
+	local a=inn('Attachment')
+	a.Name=n
+	a.CFrame=cf
+	a.Parent=p
+	return a
 end
-
-local function Rig()
-	local CharacterClone = Instancenew("Model")
-	CharacterClone.Name = Name
-
-	local Head = Part("Head", HeadSize, CharacterClone)
-	local HumanoidRootPart = Part("HumanoidRootPart", TorsoSize, CharacterClone)
-	local Torso = Part("Torso", TorsoSize, CharacterClone)
-	local RightArm = Part("Right Arm", LimbSize, CharacterClone)
-	local LeftArm = Part("Left Arm", LimbSize, CharacterClone)
-	local RightLeg = Part("Right Leg", LimbSize, CharacterClone)
-	local LeftLeg = Part("Left Leg", LimbSize, CharacterClone)
-
-	Motor6D("Right Shoulder", Torso, RightArm, CFramenew(1, 0.5, 0, 0, 0, 1, 0, 1, 0, -1, -0, -0), CFramenew(-0.5, 0.5, 0, 0, 0, 1, 0, 1, 0, -1, -0, -0))
-	Motor6D("Left Shoulder", Torso, LeftArm, CFramenew(-1, 0.5, 0, -0, -0, -1, 0, 1, 0, 1, 0, 0), CFramenew(0.5, 0.5, 0, -0, -0, -1, 0, 1, 0, 1, 0, 0))
-	Motor6D("Right Hip", Torso, RightLeg, CFramenew(1, -1, 0, 0, 0, 1, 0, 1, 0, -1, -0, -0), CFramenew(0.5, 1, 0, 0, 0, 1, 0, 1, 0, -1, -0, -0))
-	Motor6D("Left Hip", Torso, LeftLeg, CFramenew(-1, -1, 0, -0, -0, -1, 0, 1, 0, 1, 0, 0), CFramenew(-0.5, 1, 0, -0, -0, -1, 0, 1, 0, 1, 0, 0))
-	Motor6D("Neck", Torso, Head, CFramenew(0, 1, 0, -1, -0, -0, 0, 0, 1, 0, 1, 0), CFramenew(0, -0.5, 0, -1, -0, -0, 0, 0, 1, 0, 1, 0))
-	Motor6D("RootJoint", HumanoidRootPart, Torso, CFramenew(0, 0, 0, -1, -0, -0, 0, 0, 1, 0, 1, 0), CFramenew(0, 0, 0, -1, -0, -0, 0, 0, 1, 0, 1, 0))
-
-	Attachment("HairAttachment", CFramenew(0, 0.600000024, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Head)
-	Attachment("HatAttachment", CFramenew(0, 0.600000024, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Head)
-	Attachment("FaceFrontAttachment", CFramenew(0, 0, -0.600000024, 1, 0, 0, 0, 1, 0, 0, 0, 1), Head)
-	Attachment("FaceCenterAttachment", CFramenew(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Head)
-	Attachment("NeckAttachment", CFramenew(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("BodyFrontAttachment", CFramenew(0, 0, -0.5, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("BodyBackAttachment", CFramenew(0, 0, 0.5, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("LeftCollarAttachment", CFramenew(-1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("RightCollarAttachment", CFramenew(1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("WaistFrontAttachment", CFramenew(0, -1, -0.5, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("WaistCenterAttachment", CFramenew(0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("WaistBackAttachment", CFramenew(0, -1, 0.5, 1, 0, 0, 0, 1, 0, 0, 0, 1), Torso)
-	Attachment("LeftShoulderAttachment", CFramenew(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), LeftArm)
-	Attachment("LeftGripAttachment", CFramenew(0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), LeftArm)
-	Attachment("RightShoulderAttachment", CFramenew(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), RightArm)
-	Attachment("RightGripAttachment", CFramenew(0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), RightArm)
-	Attachment("LeftFootAttachment", CFramenew(0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), LeftLeg)
-	Attachment("RightFootAttachment", CFramenew(0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), RightLeg)
-	Attachment("RootAttachment", CFramenew(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1), HumanoidRootPart)
-	
-	local Character = LocalPlayer.Character
-	local BasePart = FindInstance(Character, "BasePart", "HumanoidRootPart") or FindInstance(Character, "BasePart", "Torso") or FindInstance(Character, "BasePart", "UpperTorso") or FindInstance(Character, "BasePart", "LowerTorso") or FindInstance(Character, "BasePart", "Head") or Character and Character:FindFirstChildOfClass("BasePart", true)
-	
-	HumanoidRootPart.CFrame = BasePart and BasePart.CFrame or CFrameidentity
-
-	local Mesh = Instancenew("SpecialMesh")
-	Mesh.Name = "Mesh"
-	Mesh.MeshType = MeshTypeHead
-	Mesh.Scale = Scale
-	Mesh.Parent = Head
-
-	local face = Instancenew("Decal")
-	face.Name = "face"
-	face.Parent = Head
-
-	local Humanoid = Instancenew("Humanoid", CharacterClone)
-	Instancenew("Animator", Humanoid)
-
-	Instancenew("Shirt", CharacterClone)
-	Instancenew("Pants", CharacterClone)
-
-	Instancenew("BodyColors", CharacterClone)
-
-	local Animate = Instancenew("LocalScript")
-	Animate.Name = "Animate"
-	Animate.Parent = CharacterClone
-
-	CharacterClone.PrimaryPart = Head
-	CharacterClone.Parent = Workspace
-
-	return CharacterClone, Humanoid, HumanoidRootPart
+local h=pt('Head',vn(1,1,2))
+local t=pt('Torso',trs)
+local c=lp.Character
+local cp=fi(c,'BasePart','HumanoidRootPart')or fi(c,'BasePart','Head')or fi(c,'BasePart','Torso')or fi(c,'BasePart','LowerTorso')or c and c:FindFirstChildOfClass('BasePart', true)
+local hr=pt('HumanoidRootPart',trs)
+hr.CFrame=cp and cp.CFrame or cfn(0, 10, 0)
+local ra=pt('Right Arm',ls)
+local la=pt('Left Arm',ls)
+local rl=pt('Right Leg',ls)
+local ll=pt('Left Leg',ls)
+local hu=inn('Humanoid',r)
+local fa=inn('Decal')
+fa.Name='face'
+fa.Parent=h
+local me=inn('SpecialMesh')
+me.Name='Mesh'
+me.MeshType=Enum.MeshType.Head
+me.Scale=vn(1.25,1.25,1.25)
+me.Parent=h
+inn('Animator',hu)
+m('Right Shoulder',t,ra,cfn(1,0.5,0,0,0,1,0,1,0,-1,-0,-0),cfn(-0.5,0.5,0,0,0,1,0,1,0,-1,-0,-0))
+m('Left Shoulder',t,la,cfn(-1,0.5,0,-0,-0,-1,0,1,0,1,0,0),cfn(0.5,0.5,0,-0,-0,-1,0,1,0,1,0,0))
+m('Right Hip',t,rl,cfn(1,-1,0,0,0,1,0,1,0,-1,-0,-0),cfn(0.5,1,0,0,0,1,0,1,0,-1,-0,-0))
+m('Left Hip',t,ll,cfn(-1,-1,0,-0,-0,-1,0,1,0,1,0,0),cfn(-0.5,1,0,-0,-0,-1,0,1,0,1,0,0))
+m('Neck',t,h,cfn(0,1,0,-1,-0,-0,0,0,1,0,1,0),cfn(0,-0.5,0,-1,-0,-0,0,0,1,0,1,0))
+m('RootJoint',hr,t,cfn(0,0,0,-1,-0,-0,0,0,1,0,1,0),cfn(0,0,0,-1,-0,-0,0,0,1,0,1,0))
+inn('BodyColors',r)
+inn('Shirt',r)
+inn('Pants',r)
+inn('ShirtGraphic',r)
+at('HairAttachment',cfn(0,0.600000024,0,1,0,0,0,1,0,0,0,1),h)
+at('HatAttachment',cfn(0,0.600000024,0,1,0,0,0,1,0,0,0,1),h)
+at('FaceFrontAttachment',cfn(0,0,-0.600000024,1,0,0,0,1,0,0,0,1),h)
+at('FaceCenterAttachment',cfn(0,0,0,1,0,0,0,1,0,0,0,1),h)
+at('NeckAttachment',cfn(0,1,0,1,0,0,0,1,0,0,0,1),t)
+at('BodyFrontAttachment',cfn(0,0,-0.5,1,0,0,0,1,0,0,0,1),t)
+at('BodyBackAttachment',cfn(0,0,0.5,1,0,0,0,1,0,0,0,1),t)
+at('LeftCollarAttachment',cfn(-1,1,0,1,0,0,0,1,0,0,0,1),t)
+at('RightCollarAttachment',cfn(1,1,0,1,0,0,0,1,0,0,0,1),t)
+at('WaistFrontAttachment',cfn(0,-1,-0.5,1,0,0,0,1,0,0,0,1),t)
+at('WaistCenterAttachment',cfn(0,-1,0,1,0,0,0,1,0,0,0,1),t)
+at('WaistBackAttachment',cfn(0,-1,0.5,1,0,0,0,1,0,0,0,1),t)
+at('LeftShoulderAttachment',cfn(0,1,0,1,0,0,0,1,0,0,0,1),la)
+at('LeftGripAttachment',cfn(0,-1,0,1,0,0,0,1,0,0,0,1),la)
+at('RightShoulderAttachment',cfn(0,1,0,1,0,0,0,1,0,0,0,1),ra)
+at('RightGripAttachment',cfn(0,-1,0,1,0,0,0,1,0,0,0,1),ra)
+at('LeftFootAttachment',cfn(0,-1,0,1,0,0,0,1,0,0,0,1),ll)
+at('RightFootAttachment',cfn(0,-1,0,1,0,0,0,1,0,0,0,1),rl)
+at('RootAttachment',cfn(0,0,0,1,0,0,0,1,0,0,0,1),hr)
+r.PrimaryPart=h
+local function rc(c,cf)
+	c:GetPropertyChangedSignal('CFrame'):Wait()
+	c.CFrame=cf
 end
-
-local CharacterClone = nil
-local Humanoid = nil
-local HumanoidRootPart = nil
-
-local CloneAccessories = { }
-
-local function AlignAccessory(Handle, MeshId, TextureId, HandleClone)
-	local AccessoryAlign = true
-
-	for _, Table in pairs(Accessories) do
-		if stringmatch(MeshId, Table.Mesh) and stringmatch(TextureId, Table.Texture) and not Parented(Table.Handle) then
-			local Target = Table.Name
-			if type(Target) == "string" then
-				Target = FindInstance(CharacterClone, "BasePart", Table.Name)
+local function f(c)
+	wfcoc(c,'Humanoid')
+	tw()
+	local cf=cc.CFrame
+	cc.CameraSubject=chch
+	lp.Character=chc
+	ts(rc,cc,cf)
+end
+local function aac(h,hc,m,tid)
+	local al=true
+	for _,t in pairs(acst)do
+		if sm(m,t.m)and sm(tid,t.t) and not e(t.h)then
+			local n=t.n
+			if type(n)=="string"then
+				n=fi(chc,"BasePart",n)
 			end
-			if typeof(Target) == "Instance" then
-				Table.Handle = Handle
-				tableinsert(Aligns, { Part0 = Handle, Part1 = Target, CFrame = Table.CFrame })
-				AccessoryAlign = false
+			if typeof(n)=="Instance"then
+				t.h=h
+				ti(a,{h,n,t.c})
+				al=false
 				break
 			end
 		end
 	end
-
-	if AccessoryAlign then
-		tableinsert(Aligns, { Part0 = Handle, Part1 = HandleClone })
+	if al then
+		ti(a,{h,hc})
 	end
 end
-
-local function DescendantAdded(Instance)
-	if Instance:IsA("Accessory") then
-		taskspawn(function()
-			local Handle = WaitForChildOfClassAndName(Instance, "BasePart", "Handle")
-			local IsA = Handle:IsA("MeshPart")
-
-			local Mesh = IsA and Handle or WaitForChildOfClass(Handle, "SpecialMesh")
-			local MeshId = Mesh.MeshId
-
-			local Id = IsA and "TextureID" or "TextureId"
-			local TextureId = Mesh[Id]
-
-			local Create = true
-
-			for _, Table in pairs(CloneAccessories) do
-				if Table.Mesh == MeshId and Table.Texture == TextureId and not Parented(Table.Handle) then
-					Table.Handle = Handle
-					Create = false
-
-					AlignAccessory(Handle, MeshId, TextureId, Table.HandleClone)
-					break
-				end
+local function caf(i)
+	local m=true
+	local h=wfcocan(i,'BasePart','Handle')
+	local mp=h:IsA('MeshPart')
+	local s=mp and h or wfcoc(h,'SpecialMesh')
+	local tid=mp and'TextureID'or'TextureId'
+	local sm=s.MeshId
+	local st=s[tid]
+	for _,t in pairs(acs)do
+		if t[1]==sm and t[2]==st and not e(t[3])then
+			t[3]=h
+			m=false
+			aac(h,t[4],sm,st)
+			break
+		end
+	end
+	if m then
+		local ic=i:Clone()
+		local ih=wfcocan(ic,'BasePart','Handle')
+		ih.Transparency=1
+		ih:BreakJoints()
+		local at=wfcoc(ih,'Attachment')
+		local n=at.Name
+		local w=inn('Weld')
+		w.Name='AccessoryWeld'
+		w.Part0=ih
+		w.C0=at.CFrame
+		for _,at in pairs(chc:GetDescendants())do
+			if at:IsA('Attachment')and at.Name==n then
+				w.Part1=at.Parent
+				w.C1=at.CFrame
 			end
-
-			if Create then
-				Instance.Archivable = true
-
-				for _, Instance in pairs(Instance:GetDescendants()) do
-					Instance.Archivable = true
+		end
+		w.Parent=ih
+		ic.Parent=chc
+		aac(h,ih,sm,st)
+		ti(acs,{sm,st,h,ih})
+	end
+end
+local function ca(i)
+	if i:IsA('Accessory')then
+		ts(caf,i)
+	end
+end
+local function cl(c)
+	while e(c)do
+		for _,b in pairs(c:GetChildren())do
+			if b:IsA("BasePart")then
+				b.CanCollide=false
+			end
+		end
+		prs:Wait()
+	end
+end
+local function oca()
+	local c=lp.Character
+	if c and c~=chc then
+		tc(a)
+		ts(f,c)
+		local cf=cc.CFrame
+		cc.CameraSubject=chch
+		ts(rc,cc,cf)
+		ts(cl,c)
+		local hr=wfcocan(c,'BasePart','HumanoidRootPart')
+		for _,i in pairs(fl)do
+			if hr and typeof(i)=="Instance"then
+				if i:IsA("Humanoid")then
+					i=i.Parent
 				end
-
-				local AccessoryClone = Instance:Clone()
-				AccessoryClone.Parent = CharacterClone
-
-				local HandleClone = WaitForChildOfClassAndName(AccessoryClone, "BasePart", "Handle")
-				HandleClone.Transparency = 1
-				HandleClone:BreakJoints()
-
-				local Attachment = WaitForChildOfClass(HandleClone, "Attachment")
-				local Name = Attachment.Name
-
-				local Weld = Instancenew("Weld")
-				Weld.Name = "AccessoryWeld"
-				Weld.Part0 = HandleClone
-				Weld.C0 = Attachment.CFrame
-
-				for _, Attachment in pairs(Attachments) do
-					if Attachment.Name == Name then
-						Weld.Part1 = Attachment.Parent
-						Weld.C1 = Attachment.CFrame
+				if i:IsA("Model")then
+					i=fi(i,"BasePart","HumanoidRootPart")
+				end
+				if e(i)and i:IsA("BasePart")and not i.Anchored then
+					local s=oc()
+					while e(hr)and e(i)and i.AssemblyLinearVelocity.Magnitude<=50 and oc()-s<=1 do
+						hr.AssemblyAngularVelocity=vf
+						hr.AssemblyLinearVelocity=vf
+						hr.CFrame=i.CFrame
+						ps:Wait()
 					end
 				end
-
-				Weld.Parent = HandleClone
-
-				AlignAccessory(Handle, MeshId, TextureId, HandleClone)
-				tableinsert(CloneAccessories, { Mesh = Mesh.MeshId, Texture = Mesh[Id], HandleClone = HandleClone, Handle = Handle })
 			end
-		end)
-	elseif Instance:IsA("JointInstance") then
-		taskspawn(function()
-			taskwait()
-			Instance:Destroy()
-		end)
-	end
-end
-
-local function RefreshCamera()
-	local CameraCFrame = CurrentCamera.CFrame
-
-	taskspawn(function()
-		CurrentCamera:GetPropertyChangedSignal("CFrame"):Wait()
-		CurrentCamera.CFrame = CameraCFrame
-	end)
-end
-
-local function CameraSubject()
-	if CurrentCamera.CameraSubject ~= Humanoid then
-		CurrentCamera.CameraSubject = Humanoid
-	end
-end
-
-local function OnCharacterAdded()
-	local Character = LocalPlayer.Character
-
-	if Character ~= CharacterClone then
-		for _, Table in pairs(Aligns) do
-			Table.Handle = nil
 		end
-
-		RefreshCamera()
-		CameraSubject()
-
-		taskspawn(function()
-			WaitForChildOfClass(Character, "Humanoid")
-			PreSimulation:Wait()
-
-			RefreshCamera()
-			CameraSubject()
-			LocalPlayer.Character = CharacterClone
-		end)
-
-		RaycastParameters.FilterDescendantsInstances = { Character }
-
-		local Position = HumanoidRootPart.Position + Vector3new(mathrandom(- 32, 32), 1, mathrandom(- 32, 32))
-		local RaycastResult = Workspace:Raycast(Position, RaycastDirection, RaycastParameters)
-		WaitForChildOfClassAndName(Character, "BasePart", "HumanoidRootPart").CFrame = RaycastResult and CFramenew(RaycastResult.Position) or CFramenew(Position)
-
-		PreSimulation:Wait()
-		Character:BreakJoints()
-
-		for _, Instance in pairs(Character:GetDescendants()) do
-			DescendantAdded(Instance)
+		if chr and hr then
+			rp.FilterDescendantsInstances={c}
+			local simn=mi(32,oc()-sim)
+			local p=chr.CFrame*cfn(mr(-simn,simn),0,mr(-simn,simn))
+			local r=w:Raycast(p.Position,rad,rp)
+			hr.AssemblyLinearVelocity=vz
+			hr.AssemblyAngularVelocity=vz
+			hr.CFrame=r and cfn(r.Position)or p
 		end
-
-		Character.DescendantAdded:Connect(DescendantAdded)
+		prs:Wait()
+		c:BreakJoints()
+		for _,i in pairs(c:GetChildren())do
+			ca(i)
+		end
+		c.ChildAdded:Connect(ca)
 	end
 end
-
-local function Disconnect(Argument)
-	if typeof(Argument) == "RBXScriptConnection" then
-		Argument:Disconnect()
+local function sr(be)
+	ip:Disconnect()
+	chp:Disconnect()
+	con:Disconnect()
+	ad:Disconnect()
+	tc(a)
+	tc(l)
+	tc(acs)
+	if e(chc)then
+		chc:Destroy()
+	end
+	if e(be)then
+		be:Destroy()
 	end
 end
-
-local function StopReanimate()
-	Disconnect(Changed)
-	Disconnect(CharacterAdded)
-	Disconnect(Connection)
-	
-	tableclear(Aligns)
-	tableclear(Attachments)
-
-	if Parented(CharacterClone) then
-		CharacterClone:Destroy()
+local function sc(be)
+	sg:SetCore('ResetButtonCallback',be)
+end
+local function cn(p0,p1,c)
+	if e(p0)and not p0.Anchored and p0.ReceiveAge==0 and e(p1)then
+		p0.AssemblyAngularVelocity=vz
+		local p=p1.Position
+		if not l[p0]then
+			l[p0]=p
+		end
+		local lv=((p-l[p0])/dt)
+		local lvn=lv*27
+		p0.AssemblyLinearVelocity=vn(lvn.X,27,lvn.Z)
+		l[p0]=p
+		p0.CFrame=p1.CFrame*ans*(c or cfi)
 	end
 end
-
-local function Align(Part0, Part1, CFrame)
-	if Parented(Part0) and Part0.ReceiveAge == 0 and Parented(Part1) then
-		Part0.AssemblyAngularVelocity = Vector3zero
-
-		local LinearVelocity = Part1.AssemblyLinearVelocity * Linear
-		Part0.AssemblyLinearVelocity = Vector3new(LinearVelocity.X, Linear, LinearVelocity.Z)
-
-		Part0.CFrame = Part1.CFrame * Sleep * ( CFrame or CFrameidentity )
-	end
-end
-
-local function Reanimate()
-	local clock = osclock()
-	CharacterClone, Humanoid, HumanoidRootPart = Rig()
-
-	CharacterClone:GetPropertyChangedSignal("Parent"):Connect(function()
-		if not Parented(CharacterClone) then
-			StopReanimate()
+local function yeah()
+	chc=r:Clone()
+	chch=chc.Humanoid
+	chr=chc.HumanoidRootPart
+	chc.Parent=w
+	ip=ui.InputBegan:Connect(function(i,g)
+		if not g then
+			local up=i.UserInputType
+			if up==ut or up==um then
+				local t=mo.Target
+				if e(t)then
+					local p=t.Parent
+					if p:IsA("Model") and p~=chc and p:FindFirstChildOfClass("Humanoid")then
+						ti(fl,p)
+					end
+				end
+			end
 		end
 	end)
-
-	local BindableEvent = Instancenew("BindableEvent")
-
-	local function SetCore()
-		StarterGui:SetCore("ResetButtonCallback", BindableEvent)
-	end
-
-	BindableEvent.Event:Connect(StopReanimate)
-	RefitCamera()
-
-	OnCharacterAdded()
-	CharacterAdded = LocalPlayer:GetPropertyChangedSignal("Character"):Connect(OnCharacterAdded)
-
-	local Success = false
-
-	Connection = PostSimulation:Connect(function()
-		if not Success then
-			Success = pcall(SetCore)
+	local be=inn('BindableEvent')
+	be.Event:Connect(sr,be)
+	chp=chc:GetPropertyChangedSignal('Parent'):Connect(function()
+		if not e(chc)then
+			sr(be)
+		end
+	end)
+	local s=false
+	con=ps:Connect(function()
+		tim=oc()
+		dt=tim-ltim
+		ltim=tim
+		if not s then
+			s=pcall(sc,be)
 		else
-			SetCore()
+			sc(be)
 		end
-
-		local clock = osclock()
-
-		Linear = 28 + mathcos(clock)
-		local Axis = 0.0075 * mathcos(clock * 15)
-		Sleep = CFramenew(0, 0, Axis)
-
-		for Index, Table in pairs(Aligns) do
-			Align(Table.Part0, Table.Part1, Table.CFrame)
+		if shp then
+			shp(lp,'SimulationRadius',1000)
+		end
+		local ax=0.005*si(tim*15)
+		ans=cfn(ax,0,ax)
+		for _,t in pairs(a)do
+			cn(t[1],t[2],t[3])
 		end
 	end)
-
-	return {
-		Version = "RELEASE_1",
-		Time = osclock() - clock,
-	}
+	fc()
+	oca()
+	ad=lp:GetPropertyChangedSignal('Character'):Connect(oca)
 end
-
-local API = Reanimate()
-print("Emperean Reanimate:", API.Version, API.Time)
+yeah()
 
 local script = game:GetObjects("rbxassetid://8403394444")[1]
 wait(0.2)
